@@ -19,20 +19,7 @@ Node.prototype.addWord = function (word) {
 		this.root = word;
 		return;
 	}
-	var combinedWords
-	if (this.root > word) {
-		combinedWords = this.root + ':' + word
-	} else {
-		combinedWords = word + ':' + this.root
-	}
-	var wordDistance
-	if (levenshteinCache[combinedWords]) {
-		wordDistance = levenshteinCache[combinedWords];
-	} else {
-		wordDistance = levenshteinDistance(this.root, word);
-		levenshteinCache[combinedWords] = wordDistance;
-	}
-	// var wordDistance = levenshteinDistance(this.root, word);
+	var wordDistance = this.calculateWordDistance(word);
 	if (!(wordDistance in this.branches)) {
 		this.branches[wordDistance] = new Node();
 	}
@@ -45,7 +32,7 @@ Node.prototype.findWord = function (word, tolerance) {
 		return null;
 	}
 	var matches = [];
-	var wordDistance = levenshteinDistance(word, this.root);
+	var wordDistance = this.calculateWordDistance(word);
 	if (wordDistance <= searchTolerance) {
 		matches.push(this.root);
 	}
@@ -59,6 +46,24 @@ Node.prototype.findWord = function (word, tolerance) {
 		}
 	})
 	return matches;
+}
+
+Node.prototype.calculateWordDistance = function (word) {
+	var wordDistance;
+	var combinedWords;
+	if (this.root > word) {
+		combinedWords = this.root + ':' + word
+	} else {
+		combinedWords = word + ':' + this.root
+	}
+	if (levenshteinCache[combinedWords]) {
+		wordDistance = levenshteinCache[combinedWords];
+	} else {
+		wordDistance = levenshteinDistance(this.root, word);
+		levenshteinCache[combinedWords] = wordDistance;
+	}
+	return wordDistance;
+	// return levenshteinDistance(this.root, word);
 }
 
 module.exports = Node;
