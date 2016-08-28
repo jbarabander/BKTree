@@ -36,7 +36,7 @@ Node.prototype.findWord = function (word, tolerance) {
 	}
 	var maxDistanceForBranch = wordDistance + searchTolerance;
 	var minDistanceForBranch = wordDistance - searchTolerance >= 0 ? wordDistance - searchTolerance : 0;
-	var branchesToSearch = this.branches.slice(minDistanceForBranch, maxDistanceForBranch);
+	var branchesToSearch = this.branches.slice(minDistanceForBranch, maxDistanceForBranch + 1);
 	branchesToSearch.forEach(function (element) {
 		if (element !== undefined) {
 			var matchesFromBranch = element.findWord(word, tolerance);
