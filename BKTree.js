@@ -5,9 +5,7 @@ var levenshteinCache = {};
 function Node (word, tolerance) {
 	this.branches = [];
 	this.addWord(word);
-	if (typeof tolerance === 'number') {
-		this.tolerance = tolerance;
-	}
+	this.setTolerance(tolerance);
 }
 
 Node.prototype.addWord = function (word) {
@@ -27,7 +25,7 @@ Node.prototype.addWord = function (word) {
 }
 
 Node.prototype.findWord = function (word, tolerance) {
-	var searchTolerance = typeof tolerance === 'number' ? tolerance : this.tolerance;
+	var searchTolerance = isNonNegativeNumber(tolerance) ? tolerance : this.tolerance;
 	if (typeof word !== 'string' || word === '') {
 		return null;
 	}
@@ -38,7 +36,7 @@ Node.prototype.findWord = function (word, tolerance) {
 	}
 	var maxDistanceForBranch = wordDistance + searchTolerance;
 	var minDistanceForBranch = wordDistance - searchTolerance >= 0 ? wordDistance - searchTolerance : 0;
-	var branchesToSearch = this.branches.slice(minDistanceForBranch, maxDistanceForBranch);
+	var branchesToSearch = this.branches.slice(minDistanceForBranch, maxDistanceForBranch + 1);
 	branchesToSearch.forEach(function (element) {
 		if (element !== undefined) {
 			var matchesFromBranch = element.findWord(word, tolerance);
@@ -64,6 +62,16 @@ Node.prototype.calculateWordDistance = function (word) {
 	}
 	return wordDistance;
 	// return levenshteinDistance(this.root, word);
+}
+
+Node.prototype.setTolerance = function (tolerance) {
+	if (isNonNegativeNumber(tolerance)) {
+		this.tolerance = tolerance;
+	}
+}
+
+function isNonNegativeNumber (number) {
+	return typeof number === 'number' && number >= 0;
 }
 
 module.exports = Node;
