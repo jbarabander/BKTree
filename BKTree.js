@@ -1,5 +1,7 @@
 var levenshteinDistance = require('./levenshtein');
 
+var levenshteinCache = {};
+
 function Node (word, tolerance) {
 	this.branches = [];
 	this.addWord(word);
@@ -17,7 +19,20 @@ Node.prototype.addWord = function (word) {
 		this.root = word;
 		return;
 	}
-	var wordDistance = levenshteinDistance(this.root, word);
+	var combinedWords
+	if (this.root > word) {
+		combinedWords = this.root + ':' + word
+	} else {
+		combinedWords = word + ':' + this.root
+	}
+	var wordDistance
+	if (levenshteinCache[combinedWords]) {
+		wordDistance = levenshteinCache[combinedWords];
+	} else {
+		wordDistance = levenshteinDistance(this.root, word);
+		levenshteinCache[combinedWords] = wordDistance;
+	}
+	// var wordDistance = levenshteinDistance(this.root, word);
 	if (!(wordDistance in this.branches)) {
 		this.branches[wordDistance] = new Node();
 	}
